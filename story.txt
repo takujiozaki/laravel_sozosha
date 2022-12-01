@@ -1,0 +1,176 @@
+#setting
+php -r "copy('https://readouble.com/laravel/8.x/ja/install-ja-lang-files.php', 'install-ja-lang.php');"
+php -f install-ja-lang.php
+php -r "unlink('install-ja-lang.php');"
+config/app.php
+
+#first Routing
+web.php
+return view('home'); 
+$arr = ['創造社デザイン専門学校','情報セキュリティ'];
+return $arr;
+return view('home');
+
+php artisan make:controller HomeController
+web.php
+Route::get('/',[HomeController::class,'index']);
+
+Bookモデルを作成
+php artisan make:model Book -mf
+
+Schema::create('books', function (Blueprint $table) {
+    $table->id();
+    $table->string('title',50);
+    $table->string('ISBN_CODE',13);
+    $table->string('author',20)->nullable();
+    $table->date('published_at');
+    $table->timestamps();
+});
+
+php artisan migrate
+
+Faker
+
+database/factorys/BookFactory.php
+
+public function definition()
+{
+    return [
+        'title'=>$this->faker->realText(30),
+        'ISBN_CODE'=>$this->faker->numerify('9784#########'),
+        'author'=>$this->faker->name(),
+        'published_at'=>$this->faker->date('Y-m-d'),
+    ];
+}
+
+database/seeders/DabaseSeeder.php
+
+Book::factory(10)->create();
+
+php artisan migrate:fresh --seed
+
+Bookモデルは命名規則でbooksテーブルと紐づく
+* 主キーはid(BigInt)
+
+//命名規則に沿わない場合
+//モデルクラスに追記
+protected $table = 'booklist';
+
+//PKの指定
+protected $primaryKey = 'book_id';
+
+全件取得
+$books = Book::get();
+$books = Book::all();
+
+クエリの作成
+$books = Book::where('published_at','>=','2000-01-01')
+    ->orderBy('published_at','desc')
+    ->get();
+
+単一モデル
+$books = Book::find(2);//PKの指定
+/*foreachで回せない*/
+
+集計
+$count = Book::get()->count();
+
+データの追加
+php artisan tinker 
+> use \App\Models\Book as Book
+> $book = new Book();
+= App\Models\Book {#3592}
+> $book->title = 'PHP入門'
+= "PHP入門"
+> $book->ISBN_CODE = '9784123412345'
+= "9784123412345"
+> $book->author = '池井戸潤'
+= "池井戸潤"
+> $book->published_at = '2022-11-11'
+= "2022-11-11"
+> $book->save();
+= true
+
+データの更新
+
+> $book = Book::find(3)
+> $book->title = "水牛がドナドナされた日"
+= "水牛がドナドナされた日"
+> $book->save();
+= true
+
+データの削除
+> Book::find(11)->delete()
+> Book::where('published_at','>','1999-12-31')->delete()
+
+投稿者の設定
+Factoryの変更
+public function definition()
+{
+    return [
+        //'user_id'=>User::factory(),
+        'user_id'=>function(){
+            return User::factory()->create()->id;
+        },
+        'title'=>$this->faker->realText(30),
+        'ISBN_CODE'=>$this->faker->numerify('9784#########'),
+        'author'=>$this->faker->name(),
+        'published_at'=>$this->faker->date('Y-m-d'),
+    ];
+}
+
+//Seederの変更
+public function run()
+{
+    // \App\Models\User::factory(10)->create();
+    //Book::factory(5)->create();
+    User::factory(10)->create()->each(function($user){
+        Book::factory(random_int(3,5))->create([
+            'user_id'=>$user->id,//user_idを上書きする
+        ]);
+    });
+}
+
+//Viewの呼び出し
+<table class="table">
+    <tr>
+        <th>ISBN</th>
+        <th>タイトル</th>
+        <th>著者</th>
+        <th>登録者</th>
+        <th>出版日</th>
+    </tr>
+    @foreach($books as $book)
+    <tr>
+        <td>{{$book->ISBN_CODE}}</td>
+        <td>{{$book->title}}</td>
+        <td>{{$book->author}}</td>
+        <td>{{$book->user->name}}</td>
+        <td>{{$book->published_at}}</td>
+    </tr>
+    @endforeach
+</table>
+
+Controllerの変更
+$books = Book::with('user')->orderBy('published_at','desc')->get();
+
+削除：
+Route::delete("",[]);
+
+HTML側
+<form method="post">
+@csrf @method('delete')
+<button type="submit">削除</button>
+</form>
+
+#User登録フォーム
+本の登録はユーザーに限る
+コントローラーの追加
+php artisan make:controller SignupController
+
+php artisan make:controller UserLoginController
+
+
+
+#データの欠落に備える
+blade側 ヘルパー関数 optional / Model -belongTo()->withDefault([])

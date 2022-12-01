@@ -1,0 +1,20 @@
+https://www.kamome-susume.com/laravel-docker/
+
+docker-compose up -d --build
+
+修正点　Dockerfile 12 -> lts
+RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash -
+
+修正点　.env
+DB_USER=root => laravel
+
+#原因調査
+docker logs <コンテナID>
+
+http://localhost:18777
+
+docker exec -it laravel_books_php bash 
+composer create-project --prefer-dist "laravel/laravel=8.*" .
+
+PMA
+http://localhost:18779/
