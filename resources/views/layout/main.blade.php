@@ -9,12 +9,10 @@
 </head>
 <body>
     <div class="container">
-        @auth
-        <div class="text-end"><form action="/logout" method="post">@csrf<button type="submit" class="btn btn-danger">ログアウト</button></form></div>
-        @else
-        <div class="text-end"><a href="/login" class="btn btn-primary">ログイン</a></div>
-        @endauth
     @yield('content')
     </div>
+    <script>
+        @yield('script')
+    </script>
 </body>
 </html>

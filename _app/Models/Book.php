@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Book extends Model
 {
     use HasFactory;
-    protected $guarded = [];
 
-    public function user(){
-        //return $this->belongsTo(User::class);
+    public function user()
+    {
         return $this->belongsTo(User::class)->withDefault(["name"=>"【該当者無し】"]);
     }
 }

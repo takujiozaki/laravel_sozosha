@@ -1,8 +1,8 @@
 <?php
 
 namespace Database\Factories;
-
 use App\Models\User;
+
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BookFactory extends Factory
@@ -15,14 +15,15 @@ class BookFactory extends Factory
     public function definition()
     {
         return [
-            //'user_id'=>User::factory(),
-            'user_id'=>function(){
-                return User::factory()->create()->id;
-            },
-            'title'=>$this->faker->realText(30),
-            'ISBN_CODE'=>$this->faker->numerify('9784#########'),
+            'title'=>$this->faker->realText(20),
+            //'ISBN'=>$this->faker->numerify("9784#########"),
+            'ISBN'=>$this->faker->isbn13(),
             'author'=>$this->faker->name(),
-            'published_at'=>$this->faker->date('Y-m-d'),
+            'published_at'=>$this->faker->dateTimeBetween($startDate = '-5 years', $endDate = 'now')->format("Y-m-d"),
+            //'user_id'=>User::factory(),
+            // 'user_id'=>function(){
+            //     return User::factory()->create()->id;
+            // },
         ];
     }
 }
