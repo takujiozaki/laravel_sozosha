@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateBooksTable extends Migration
@@ -19,8 +18,8 @@ class CreateBooksTable extends Migration
             $table->foreignId('user_id');
             //$table->unsignedBigInteger('user_id');//外部キー
             $table->string('title',50);
-            $table->string('ISBN_CODE',13);
-            $table->string('author',20);
+            $table->string('ISBN',13);
+            $table->string('author',20)->nullable();
             $table->date('published_at')->nullable();
             $table->timestamps();
         });
